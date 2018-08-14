@@ -20,6 +20,13 @@
         type: Phaser.AUTO,
         width: 800,
         height: 600,
+        physics: {
+          default: 'arcade',
+          arcade: {
+            gravity: { y: 300 },
+            debug: false,
+          }
+        },
         //preloads scene
         scene: {
             preload: preload,
@@ -28,23 +35,72 @@
         }
     };
 
+    var player;
+    var cursors;
 var game = new Phaser.Game(config);
 
     function preload ()
     {
     this.load.image('sky', 'assets/lifeesky.jpg', {frameWidth: 800, frameHeight: 600});
+    this.load.image('ground', 'assets/platform.png', {frameWidth: 1000, frameHeight: 10});
+    this.load.spritesheet('dude', 'assets/dudes.png', { frameWidth:51.2, frameHeight: 70});
   //  this.load.image('equality', 'assets/equalityequity.png',  {frameWidth: 400, frameHeight: 300});
     }
     function create ()
     {
       this.add.image(400, 300, 'sky');
+      platforms = this.physics.add.staticGroup();
+      
       this.add.text(125, 50, 'LIFEE INSTRUCTIONS', {fontSize: '50px', fill: '#000', fontFamily: 'Georgia'})
+
+      this.add.text(50, 140, '1. The game will start out with textbooks and anti-coexist signs.\
+      \nEach book will add 10 points to your score, but each anti-coexist \
+      \nsign will remove 10 points. Jump to collect books or avoid \
+      \nanti-coexist signs. If your score goes to -10, you have lost!', {fontSize: '23px', fill: '#000', fontFamily: 'Georgia', fontAlign: 'center'});
+
+      this.add.text(50, 250, '2. Once you collect a certain number of books, the catcallers will \
+      \nappear. You have to jump in order to avoid their cars. If you get hit \
+      \nby a catcaller, you have lost the game no matter your score!', {fontSize: '23px', fill: '#000', fontFamily: 'Georgia', fontAlign: 'center'});
+
+      this.add.text(50, 340, '3. Practice making the sprite jump here!', {fontSize: '23px', fill: '#000', fontFamily: 'Georgia', fontAlign: 'center'});
+
+
+
+      platforms.create(400, 568, 'ground').setScale(5).refreshBody();
+
+      cursors = this.input.keyboard.createCursorKeys();
+
+      player = this.physics.add.sprite(70, 450, 'dude');
+      this.anims.create({
+          key:'run',
+          frames: this.anims.generateFrameNumbers('dude', { start: 1, end: 8 }),
+          frameRate: 8,
+          repeat: -1
+      });
+      player.setBounce(0.05);
+
+      player.setCollideWorldBounds(true);
+      this.physics.add.collider(player, platforms);
+
+      this.anims.create({
+          key: 'turn',
+          frames: [ { key: 'dude', frame: 8} ],
+          frameRate: 20
+      });
+
+
       this.add.text(450, 530, 'Press the right arrow key to go the next page -->', {fontSize: '16px', fill: '#000', fontFamily: 'Georgia'});
       this.add.text(20, 530, '<-- Press the left arrow key to go back', {fontSize: '16px', fill: '#000', fontFamily: 'Georgia'});
     }
     function update ()
     {
+        player.setVelocityX(0);
+        player.anims.play('run', true);
 
+        if (cursors.up.isDown && player.body.touching.down)
+          {
+            player.setVelocityY(-330);
+          }
     }
     </script>
   </body>
