@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Welcome to LIFEE</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+    <script src="Lifeestartscreen.js" type= "text/javascript"></script>
+    <style type="text/css">
+        body {
+            margin: auto;
+            width: 62.5%;
+        }
+    </style>
+    <link rel="shortcut icon" type="image/png" href="favicon.png">
+</head>
+<body>
+<script type="text/javascript">
+//config stuff
+    var config = {
+        type: Phaser.AUTO,
+        width: 800,
+        height: 600,
+        //preloads scene
+        scene: {
+            preload: preload,
+            create: create,
+            update: update
+        }
+    };
+
+    var game = new Phaser.Game(config);
+
+    function preload ()
+    {
+      //loads the images needed for our game
+      this.load.image('lifee', 'assets/lifee.png', {frameWidth: 800, frameHeight: 600});
+      this.load.image('white', 'assets/white.png', {frameWidth: 400, frameHeight: 300});
+      //
+    }
+
+    function create ()
+    {
+      cursors = this.input.keyboard.createCursorKeys();
+      this.add.image(400, 300, 'white');
+      this.add.image(400, 300, 'lifee');
+      text = this.add.text(220, 415, 'Welcome to LIFEE!', {fontSize: '35px', fill: '#000'} );
+      this.add.text(390, 155, 'EQUALITY', {fontSize: '35px', fill: '#000'} );
+      this.add.text(410, 285, 'EQUITY', {fontSize: '35px', fill: '#000'});
+      this.add.text(280, 500, 'Press the right arrow key to go the next page -->', {fontSize: '16px', fill: '#000', fontFamily: 'Georgia'});
+    }
+
+    function update ()
+    {}
+    </script>
+  </body>
+</html>

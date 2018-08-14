@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>LIFEE PLAY!</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+    <script src="playgame.js" type= "text/javascript"></script>
+    <style type="text/css">
+        body {
+            margin: auto;
+            width: 62.5%;
+        }
+    </style>
+    <link rel="shortcut icon" type="image/png" href="favicon.png">
+</head>
+<body>
+<script type="text/javascript">
+//config stuff
+    var config = {
+        type: Phaser.AUTO,
+        width: 800,
+        height: 600,
+        physics: {
+          default: 'arcade',
+          arcade: {
+            gravity: { y: 300 },
+            debug: false,
+          }
+        },
+        //preloads scene
+        scene: {
+            preload: preload,
+            create: create,
+            update: update
+              }
+    };
+    var clouds;
+    var game = new Phaser.Game(config);
+
+    function preload ()
+    {
+      this.load.image('sky', 'assets/lifeesky.jpg', {frameWidth: 400, frameHeight: 300});
+      this.load.image('cloud', 'assets/lifeecloud.png');
+    //this.load.image('equality', 'assets/equalityequity.png',  {frameWidth: 400, frameHeight: 300});
+    }
+    function create ()
+    {
+      this.add.image(400, 300, 'sky');
+      this.add.text(250, 50, 'LIFEE PLAY', {fontSize: '50px', fill: '#000', fontFamily: 'Georgia'});
+      this.add.text(180, 280,'Press the Space Bar to start the game!!', {fontSize: '25px', fill: '#000', fontFamily: 'Georgia'});
+      this.add.text(20, 530, '<-- Press the left arrow key to go back', {fontSize: '16px', fill: '#000', fontFamily: 'Georgia'});
+      clouds = this.physics.add.group({
+             //gravity: {y: 0},
+           repeat: 0,
+           key: 'cloud',
+           setXY: { x: 200, y: 200},
+           allowGravity: false
+         });
+        clouds.children.iterate(function (child) {
+
+         Phaser.Math.FloatBetween(-30, -50)
+        //   child.setCollideWorldBounds(true);
+          // if (child.x === 150) {
+            // child.setVelocityX(0);
+            // child.setVelocityX(100);
+          // }
+        //   else {
+        child.setVelocityX(-100);
+    //       }
+   });
+    }
+    function update (){
+      clouds.children.iterate(function (child) {
+
+        if (child.x <= -30) {
+          child.x = 850
+          console.log("It should be iterating.")
+        }
+      });
+
+    }
+    </script>
+  </body>
+  </html>
