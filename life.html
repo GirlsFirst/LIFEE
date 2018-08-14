@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <link rel="shortcut icon" type="image/png" href="favicon.png"/>
+    <meta charset="UTF-8" />
+    <title>LIFEE</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+    <style type="text/css">
+        body {
+            margin: auto;
+            width: 62.5%
+        }
+    </style>
+    <link rel="shortcut icon" type="image/png" href="favicon.png">
+</head>
+<body>
+<script type="text/javascript">
+
+    var config = {
+        type: Phaser.AUTO,
+        width: 800,
+        height: 600,
+        physics: {
+          default: 'arcade',
+          arcade: {
+            gravity: { y: 300 },
+            debug: false,
+          }
+        },
+        //preloads scene
+        scene: {
+            preload: preload,
+            create: create,
+            update: update
+        }
+    };
+
+    var books;
+    var platforms;
+    var cursors;
+    var score = 0;
+    var gameOver = false;
+    var clouds;
+    var scoreText;
+    var player;
+    var winScore = 100 ;
+    var bookNumber = 6;
+    var bookPos = [500, 1000, 1500, 2000, 2500, 3000, 3500];
+    var bombs;
+    var signNumber = 4;
+    var signPos = [700, 1400, 2100, 2800, 3500, 4200, 4900];
+    var cars;
+
+    var game = new Phaser.Game(config);
+
+    function preload ()
+    {
+      //loads the images needed for our game=
+      this.load.image('cloud', 'assets/lifeecloud.png');
+      this.load.image('sky', 'assets/lifeesky.jpg');
+      this.load.image('ground', 'assets/platform.png', {frameWidth: 1000, frameHeight: 10});
+      this.load.spritesheet('dude', 'assets/dudes.png', { frameWidth:51.2, frameHeight: 70});
+      this.load.image('book', 'assets/book.png.png');
+      this.load.image('bomb', 'assets/coexistsign.png');
+      this.load.image('car', 'assets/catcallfinal.png')
+    }
+
+    //this function does all of the creating for the game
+    function shuffle(a) {
+      var j, x, i;
+      for (i = a.length - 1; i > 0; i--) {
+        j = Math.floor(Math.random() * (i + 1));
+        x = a[i];
+        a[i] = a[j];
+        a[j] = x;
+      }
+      return a;
+    }
+
+    function hitCar (player, car)
+    {
+      this.physics.pause();
+      player.setTint(0xB22222);
+      gameOver = true;
+      console.log('I hit the car');
+    }
+
+    function create ()
+    {
+
+      this.add.image(400, 300, 'sky');
+
+      platforms = this.physics.add.staticGroup();
+      player = this.physics.add.sprite(70, 450, 'dude');
+
+      books = this.physics.add.group({
+            key: 'book',
+            repeat: bookNumber,
+            setXY: { x: 500, y: 400, stepX: 500, stepY: -20 },
+            allowGravity: false
+      });
+
+      i = 0;
+
+      bookPos = shuffle(bookPos)
+
+      books.children.iterate(function (child) {
+          child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+          child.x = bookPos[i];
+          i++;
+        });
+
+        player.setCollideWorldBounds(true);
+        this.physics.add.overlap(player, books, collectBook, null, this);
+
+        this.physics.add.collider(player, platforms);
+        this.physics.add.collider(books, platforms);
+
+        books.setVelocityX(-120);
+
+        bombs = this.physics.add.group({
+          key: 'bomb',
+          repeat: signNumber,
+          setXY: { x: 500, y: 400, stepX: 500, stepY: -20 },
+          allowGravity: false
+    });
+
+      i = 0;
+
+      signPos = shuffle(signPos)
+
+      bombs.children.iterate(function (child) {
+          child.setBounceY(Phaser.Math.FloatBetween(0.2, 0.4));
+          child.x = signPos[i];
+          i++;
+        });
+
+        bombs.setVelocityX(-180);
+
+        this.physics.add.overlap(player, bombs, hitBomb, null, this);
+
+        this.physics.add.collider(bombs, platforms);
+
+        cars = this.physics.add.group();
+        this.physics.add.collider(cars, platforms)
+        this.physics.add.collider(player, cars, hitCar, null, this);
+
+        platforms.create(400, 568, 'ground').setScale(5).refreshBody();
+        player.setBounce(0.05);
+
+        this.anims.create({
+          key:'run',
+          frames: this.anims.generateFrameNumbers('dude', { start: 1, end: 8 }),
+          frameRate: 8,
+          repeat: -1
+        });
+
+      cursors = this.input.keyboard.createCursorKeys();
+
+
+      this.anims.create({
+          key: 'turn',
+          frames: [ { key: 'dude', frame: 8} ],
+          frameRate: 20
+      });
+
+      clouds = this.physics.add.group({
+            key: 'cloud',
+            repeat: 4,
+            setXY: { x: 120, y: 80, stepX: 120, stepY: 20 },
+            allowGravity: false
+          });
+                  clouds.children.iterate(function (child) {
+
+                  child.setVelocityX(Phaser.Math.FloatBetween(-30, -50));
+            });
+
+      scoreText = this.add.text(16, 16,'score: 0', {fontSize: '32px', fill: '#000'});
+    }
+
+function createcar()
+{
+  var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
+
+  var car = cars.create(x, 300, 'car').setScale(.3);
+  car.setVelocity(Phaser.Math.Between(-300, -100), 0);
+  car.allowGravity = true;
+
+}
+
+function collectBook (player, book)
+{
+    book.disableBody(true, true);
+    score += 10;
+
+    scoreText.setText('Score: ' + score);
+    if (score % 30 == 0)
+    {
+      createcar();
+    }
+book.x=1500;
+book.enableBody(true, book.x, book.y, true, true);
+book.setVelocityX(Phaser.Math.Between(-180, -120));
+
+}
+
+function hitBomb (player, bomb)
+  {
+      bomb.disableBody(true, true);
+      score -= 10;
+
+      scoreText.setText('Score: ' + score);
+
+      bomb.x=1500;
+      bomb.enableBody(true, bomb.x, bomb.y, true, true);
+      bomb.setVelocityX(Phaser.Math.Between(-180, -160));
+  }
+
+
+
+    function update ()
+    {
+      if (score < 0)
+      {
+        gameOver = true;
+        this.physics.pause();
+        player.setTint(0xB22222);
+      }
+
+        player.setVelocityX(0);
+        player.anims.play('run', true);
+
+      if (cursors.up.isDown && player.body.touching.down)
+      {
+          player.setVelocityY(-330);
+      }
+
+      books.children.iterate(function (child) {
+
+        if (child.x <= -100) {
+          child.x = 700
+        }
+});
+
+      bombs.children.iterate(function (child) {
+
+        if (child.x <= -100) {
+          child.x = 700
+        }
+      });
+
+      clouds.children.iterate(function (child) {
+
+        if (child.x <= -50) {
+          child.x = 800
+        }
+
+        if (score === -10)
+        {
+          document.location.href = 'losescreen.html';
+        }
+        if (gameOver = true) {
+          document.location.href = 'losescreen.html';
+        }
+
+
+});
+
+}
+
+</script>
+
+</body>
+</html>
