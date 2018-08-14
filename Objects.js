@@ -9,3 +9,4 @@ function checkKey(e) {
   else if (e.keyCode == '37') {
     document.location.href = 'explaining.html';
   }
+}
