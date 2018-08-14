@@ -56,7 +56,7 @@
     function preload ()
     {
       //loads the images needed for our game=
-      this.load.image('cloud', 'assets/ifeecloud.png');
+      this.load.image('cloud', 'assets/lifeecloud.png');
       this.load.image('sky', 'assets/lifeesky.jpg');
       this.load.image('ground', 'assets/platform.png', {frameWidth: 1000, frameHeight: 10});
       this.load.spritesheet('dude', 'assets/dudes.png', { frameWidth:51.2, frameHeight: 70});
@@ -259,7 +259,7 @@ function hitBomb (player, bomb)
         if (child.x <= -50) {
           child.x = 800
         }
-        
+
         if (score === -10)
         {
           document.location.href = 'losescreen.html';
