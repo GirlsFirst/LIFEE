@@ -56,13 +56,13 @@
     function preload ()
     {
       //loads the images needed for our game=
-      this.load.image('cloud', 'lifeecloud.png');
-      this.load.image('sky', 'lifesky.jpg');
+      this.load.image('cloud', 'assets/ifeecloud.png');
+      this.load.image('sky', 'assets/lifeesky.jpg');
       this.load.image('ground', 'assets/platform.png', {frameWidth: 1000, frameHeight: 10});
       this.load.spritesheet('dude', 'assets/dudes.png', { frameWidth:51.2, frameHeight: 70});
       this.load.image('book', 'assets/book.png.png');
       this.load.image('bomb', 'assets/coexistsign.png');
-      this.load.image('car', 'catcallfinal.png')
+      this.load.image('car', 'assets/catcallfinal.png')
     }
 
     //this function does all of the creating for the game
@@ -258,6 +258,11 @@ function hitBomb (player, bomb)
 
         if (child.x <= -50) {
           child.x = 800
+        }
+        
+        if (score === -10)
+        {
+          document.location.href = 'losescreen.html';
         }
 
 });
