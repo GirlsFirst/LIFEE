@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>LIFEE Objects</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+    <script src="objects.js" type= "text/javascript"></script>
+    <style type="text/css">
+        body {
+            margin: auto;
+            width: 62.5%;
+        }
+    </style>
+    <link rel="shortcut icon" type="image/png" href="favicon.png">
+</head>
+<body>
+<script type="text/javascript">
+//config stuff
+    var config = {
+        type: Phaser.AUTO,
+        width: 800,
+        height: 600,
+        //preloads scene
+        scene: {
+            preload: preload,
+            create: create,
+            update: update
+        }
+    };
+
+
+var game = new Phaser.Game(config);
+
+    function preload ()
+    {
+    this.load.image('sky', 'assets/lifeesky.jpg', {frameWidth: 800, frameHeight: 600});
+    this.load.image('book', 'assets/bigbook.png',  {frameWidth: 400, frameHeight: 300});
+    }
+    function create ()
+    {
+      this.add.image(400, 300, 'sky');
+      this.add.image(100, 200, 'book');
+      this.add.text(215, 40, 'LIFEE OBJECTS', {fontSize: '50px', fill: '#000', fontFamily: 'Georgia'});
+      this.add.text(450, 530, 'Press the right arrow key to go the next page -->', {fontSize: '16px', fill: '#000', fontFamily: 'Georgia'});
+      this.add.text(20, 530, '<-- Press the left arrow key to go back', {fontSize: '16px', fill: '#000', fontFamily: 'Georgia'});
+
+    }
+    function update ()
+    {
+
+    }
+    </script>
+  </body>
+  </html>

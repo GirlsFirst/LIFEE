@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>LIFEE</title>
+    <script src="Playgame.js" type= "text/javascript"></script>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+    <style type="text/css">
+        body {
+            margin: auto;
+            width: 62.5%
+        }
+    </style>
+    <link rel="shortcut icon" type="image/png" href="favicon.png">
+</head>
+<body>
+
+<script type="text/javascript">
+//config stuff
+    var config = {
+        type: Phaser.AUTO,
+        width: 800,
+        height: 600,
+        physics: {
+          default: 'arcade',
+          arcade: {
+            gravity: { y: 300 },
+            debug: false,
+          }
+        },
+        //preloads scene
+        scene: {
+            preload: preload,
+            create: create,
+            update: update
+        }
+    };
+//list of variables we are creating
+    var books;
+    var platforms;
+    var cursors;
+    var score = 0;
+    var gameOver = false;
+    var clouds;
+    var scoreText;
+    var player;
+    var winSent;
+    var winScore = 70;
+    var bookNumber = winScore / 10 - 1;
+    var bookPos = [500, 1000, 1500, 2000, 2500, 3000, 3500];
+    var bombs;
+    var catCallers;
+//120x156
+//makes new game
+    var game = new Phaser.Game(config);
+
+    function preload ()
+    {
+      //loads the images needed for our game
+      this.load.image('cloud', 'assets/lifeecloud.png');
+      this.load.image('sky', 'assets/sky.png');
+      this.load.image('ground', 'assets/platform.png', {frameWidth: 1000, frameHeight: 10});
+      this.load.spritesheet('dude', 'assets/dudes.png', { frameWidth:51.2, frameHeight: 70});
+      this.load.image('book', 'assets/book.png');
+      this.load.image('bomb', 'assets/bomb.png');
+      this.load.image('catCaller', 'assets/catcallfinal.png');
+      this.load.image('white', 'assets/white.png');
+    }
+
+    //this function does all of the creating for the game
+    function shuffle(a) {
+      var j, x, i;
+      for (i = a.length - 1; i > 0; i--) {
+        j = Math.floor(Math.random() * (i + 1));
+        x = a[i];
+        a[i] = a[j];
+        a[j] = x;
+      }
+      return a;
+    }
+    function hitBomb (player, bomb)
+    {
+        this.physics.pause();
+
+        player.setTint(0xff0000);
+
+        gameOver = true;
+      }
+      function hitCar (player, catCaller)
+      {
+        this.physics.pause();
+
+        player.setTint(0xB22222);
+
+        gameOver = true;
+
+        console.log('I hit the car');
+
+      }
+
+    function create ()
+    {
+      //creates the sky
+
+      this.add.image(400, 300, 'sky');
+
+      platforms = this.physics.add.staticGroup();
+
+      //sets where the books and player appear from
+      player = this.physics.add.sprite(70, 450, 'dude');
+
+        //if this works, it should add physics to the books so they fall to the ground and bounce randomly when they get there- there are 10 books
+      books = this.physics.add.group({
+            //gravity: {y: 0},
+            key: 'book',
+            repeat: bookNumber,
+            setXY: { x: 500, y: 400, stepX: 500, stepY: -20 },
+            allowGravity: false
+      });
+      //iterates that for each book they have a different bounce: the child.setBounce statement does this
+      //shuffle the bookPos list
+      i = 0;
+      books.children.iterate(function (child) {
+
+          //  Give each star a slightly different bounce
+          child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+          child.x = bookPos[i];
+          i++;
+        });
+
+        bombs = this.physics.add.group();
+
+        this.physics.add.collider(bombs, platforms);
+
+        this.physics.add.collider(player, bombs, hitBomb, null, this);
+
+        catCallers = this.physics.add.group();
+
+        this.physics.add.collider(player, catCallers, hitCar, null, this);
+
+        this.physics.add.collider(catCallers, platforms);
+
+
+
+      //creates the <ground>, referred to as platform
+      platforms.create(400, 568, 'ground').setScale(5).refreshBody();
+      //makes the books and player bounce
+      player.setBounce(0.02);
+
+      this.anims.create({
+          key:'run',
+          frames: this.anims.generateFrameNumbers('dude', { start: 1, end: 8 }),
+          frameRate: 8,
+          repeat: -1
+      });
+
+      //they can't go past the worldBounds
+      player.setCollideWorldBounds(true);
+
+      //checks to see if the book and the guy overlap the same space
+      this.physics.add.overlap(player, books, collectBook, null, this);
+
+      //they sit on top of the <ground>
+      this.physics.add.collider(player, platforms);
+      this.physics.add.collider(books, platforms);
+
+      books.setVelocityX(-120);
+
+      //creates the <cursors> so the cursors will be able to used later
+      cursors = this.input.keyboard.createCursorKeys();
+
+
+      this.anims.create({
+          key: 'turn',
+          frames: [ { key: 'dude', frame: 8} ],
+          frameRate: 20
+      });
+
+      clouds = this.physics.add.group({
+            //gravity: {y: 0},
+            key: 'cloud',
+            repeat: bookNumber,
+            setXY: { x: 120, y: 80, stepX: 120, stepY: 20 },
+            allowGravity: false
+          });
+                  clouds.children.iterate(function (child) {
+
+                  child.setVelocityX(Phaser.Math.FloatBetween(-30, -50));
+            });
+
+
+    //sets the scoreText to 32px, 16x16
+      scoreText = this.add.text(16, 16,'score: 0', {fontSize: '32px', fill: '#000'});
+
+function endPage()
+{
+  this.add.image(400, 300, 'white' )
+}
+
+    }//closes the create function
+function createBomb()
+{
+  var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
+
+  var bomb = bombs.create(x, 16, 'bomb');
+  bomb.setBounce(.5);
+  bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
+  bomb.allowGravity = false;
+}
+
+  function createCatCaller()
+  {
+    var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
+
+    var catCaller = catCallers.create(x, 300, 'catCaller').setScale(.3);
+    catCaller.setVelocity(Phaser.Math.Between(-300, -100), 0);
+    catCaller.allowGravity = true;
+
+  }
+
+
+    function update ()
+    {
+
+      //if the game is over, return the values
+      if (gameOver)
+      {
+
+
+          return;
+      }
+
+        player.setVelocityX(0);
+        player.anims.play('run', true);
+
+      if (cursors.up.isDown && player.body.touching.down)
+      {
+          player.setVelocityY(-330);
+      }
+      books.children.iterate(function (child) {
+
+        if (child.x <= -100) {
+          child.x = 700
+
+      clouds.children.iterate(function (child) {
+
+        if (child.x <= -100) {
+          child.x = 850
+        }
+
+})
+        }
+      });
+    }
+    function collectBook (player, book)
+    {
+        book.disableBody(true, true);
+
+        //  Add and update the score
+        score += 10;
+
+          scoreText.setText('Score: ' + score);
+
+        if (score % 20 == 0)
+          {
+            createBomb();
+          }
+
+
+        if (score % 30 == 0)
+        {
+          createCatCaller();
+        }
+
+
+        if (score === winScore)
+        {
+          winSent = this.add.text(40, 60,'Congratulations! Go to the next level!', {fontSize: '32px', fill: '#000'});
+          book.disableBody(true, true);
+          player.disableBody(true, true);
+      //    cloud.disableBody(true, true);
+          //console.log("Congratulations! You can go on to the next level.")
+        }
+    }
+  //closes the collectBook function
+
+</script>
+
+</body>
+</html>
