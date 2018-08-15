@@ -7,6 +7,6 @@ function checkKey(e) {
     document.location.href = 'objects.html';
   }
   else if (e.keyCode == '37') {
-    document.location.href = 'lifeestartscreen.html';
+    document.location.href = 'Lifeestartscreen.html';
   }
 }
